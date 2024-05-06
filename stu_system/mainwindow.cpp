@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QCoreApplication>
+#include <string.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,9 +14,18 @@ MainWindow::MainWindow(QWidget *parent)
     //调用函数创建数据表
     //CreateTableFunc();
 
+    comboBoxValue_sort = new QComboBox;
+    comboBoxValue_sort = ui->comboBoxValue_sort;
+
+    comboBoxOrder_sort = new QComboBox;
+    comboBoxOrder_sort = ui->comboBoxOrder_sort;
+
+
     debugTextEdit = new QTextEdit;
     // 关联debugTextEdit与Qt Designer中的TextEdit
     debugTextEdit = ui->TextEdit;
+
+
 
 
 }
@@ -70,13 +80,81 @@ void MainWindow::CreateTableFunc()     //创建SQLite数据表
 }
 void MainWindow::QueryTableFunc()      //执行排序操作
 {
-    debugTextEdit->append(QString("改功能还未完成！"));
+
+
+    QString stu_sort = comboBoxValue_sort->currentText(); // 假设这是条件字段的值
+
+   //（stu_sort=="id"）的另一种写法如下：
+   // QString sort_id = "id";
+   // bool areEqual =(condition==sort_id);
+
+
+    if(stu_sort=="id")
+    {
+        QSqlQuery id_query;
+        QString s_query = "SELECT * FROM student ORDER BY id ASC"; // 使用参数化查询
+
+        id_query.exec(s_query);
+        if(id_query.exec(s_query))
+        {
+            QMessageBox::information(this, "成功", "学生成绩排序成功！");
+        }
+        else{
+            QMessageBox::critical(this, "失败", "学生成绩排序失败！");
+        }
+        m->setEditStrategy(QSqlTableModel::OnFieldChange);
+        m->setSort(0, Qt::AscendingOrder); // 假设 id 是第一列
+        m->select();
+
+        //打印id查询结果
+        debugTextEdit->append(stu_sort + id_query.lastError().text());
+    }
+    if(stu_sort=="score")
+    {
+        QSqlQuery score_query;
+        QString s_query1 = "SELECT * FROM student ORDER BY score ASC"; // 使用升序参数化查询
+        QString s_query2 = "SELECT * FROM student ORDER BY score DESC"; // 使用倒叙参数化查询
+        QString order = comboBoxOrder_sort->currentText();
+
+        if(order=="升序")
+        {
+            if(score_query.exec(s_query1))
+            {
+                QMessageBox::information(this, "成功", "学生成绩排序成功！");
+            }
+            else{
+                QMessageBox::critical(this, "失败", "学生成绩排序失败！");
+            }
+            debugTextEdit->append(stu_sort+ "升序" + score_query.lastError().text());
+            m->setEditStrategy(QSqlTableModel::OnFieldChange);
+            m->setSort(2, Qt::AscendingOrder); // 假设 id 是第一列
+            m->select();
+        }
+        if(order=="倒序")
+        {
+            if(score_query.exec(s_query2))
+            {
+                QMessageBox::information(this, "成功", "学生成绩排序成功！");
+            }
+            else{
+                QMessageBox::critical(this, "失败", "学生成绩排序失败！");
+            }
+            debugTextEdit->append(stu_sort + "倒序" + score_query.lastError().text());
+            m->setEditStrategy(QSqlTableModel::OnFieldChange);
+            m->setSort(2, Qt::DescendingOrder);
+            m->select();
+        }
+
+    }
+
 }
 
-//排序
+//排序按钮
 void MainWindow::on_pushButtonSort_clicked()
 {
+
     QueryTableFunc();
+
 }
 
 //插入
@@ -125,8 +203,14 @@ void MainWindow::on_pushButton_INSERT_clicked()
 //删除
 void MainWindow::on_pushButton_DELETE_clicked()
 {
-    // 假设 ui->lineEdit_ID 是用户输入学号的 QLineEdit 控件
+    // 从UI组件获取学号并检查是否为0
     int studentId = ui->lineEdit_ID->text().toInt();
+    if(studentId == 0) {
+        QMessageBox::critical(this, "错误", "提示：学号不能为空！", QMessageBox::Ok);
+        return;
+    }
+    // 假设 ui->lineEdit_ID 是用户输入学号的 QLineEdit 控件
+    //int studentId = ui->lineEdit_ID->text().toInt();
 
     // 准备SQL删除语句，使用参数化查询
     QString deleteSql = QString("DELETE FROM student WHERE id = %1").arg(studentId);
@@ -152,7 +236,7 @@ void MainWindow::on_pushButton_FIND_clicked()
     // 从UI组件获取学号并检查是否为0
     int id = ui->lineEdit_ID->text().toInt();
     if(id == 0) {
-        QMessageBox::critical(this, "错误", "提示：学号不能为0。", QMessageBox::Ok);
+        QMessageBox::critical(this, "错误", "提示：学号不能为空！", QMessageBox::Ok);
         return;
     }
 

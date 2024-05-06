@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QSqlTableModel>
 #include <QTextEdit>
+#include <QComboBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -48,7 +49,8 @@ private: //自定义函数
     QSqlQueryModel sqlmodel;     //存储结果集
     QSqlTableModel *m;           //创建表格模型
     QTextEdit *debugTextEdit;    //创建文本框
-
+    QComboBox *comboBoxValue_sort;      //创建下拉框
+    QComboBox *comboBoxOrder_sort;
 
 private:
     Ui::MainWindow *ui;
