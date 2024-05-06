@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>学生成绩管理系统1.0v</string>
+   <string>学生成绩管理系统1.2v</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
