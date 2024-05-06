@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     //调用函数创建数据库
     CreateDatabaseFunc();
     //调用函数创建数据表
-    //CreateTableFunc();
+    CreateTableFunc();
 
     comboBoxValue_sort = new QComboBox;
     comboBoxValue_sort = ui->comboBoxValue_sort;
@@ -24,7 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
     debugTextEdit = new QTextEdit;
     // 关联debugTextEdit与Qt Designer中的TextEdit
     debugTextEdit = ui->TextEdit;
-
+    //将数据库和tableview联系起来
+    m = new QSqlTableModel;
+    m->setTable("student");
+    ui->tableView->setModel(m);
 
 
 
@@ -47,10 +50,6 @@ void MainWindow::CreateDatabaseFunc()  //创建SQLite数据库
     if(sqldb.open()==true)
     {
         QMessageBox::information(0,"正确","恭喜你，数据库打开成功！",QMessageBox::Ok);
-        //将数据库和tableview联系起来
-        m = new QSqlTableModel;
-        m->setTable("student");
-        ui->tableView->setModel(m);
 
     }
     else
@@ -70,7 +69,8 @@ void MainWindow::CreateTableFunc()     //创建SQLite数据表
     //执行SQL语句
     if(createquery.exec(strsql)==false)
     {
-        QMessageBox::critical(0,"失败","数据表创建失败，请重新检测！",QMessageBox::Ok);
+        QMessageBox::critical(0,"失败","数据表创建失败，可能已存在数据表！",QMessageBox::Ok);
+
     }
     else
     {
